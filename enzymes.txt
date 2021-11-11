@@ -1,0 +1,4 @@
+EcoRI;G%AATTC
+BamHI;G%GATCC
+PstI;CTGCA%G
+AluI;AG%CT
