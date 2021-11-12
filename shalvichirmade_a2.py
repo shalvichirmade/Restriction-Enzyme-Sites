@@ -6,19 +6,6 @@
 
 #Asking the user to input a FASTA file for analysis.
 
-# print("Please enter the file path to your FASTA sequence file. Your file should end with .fas or .fasta.")
-# fasta_file = input()
-
-#Need to check if file is .fas or .fasta
-#for i in fasta_file: #looping through every character entered
-# if fasta_file.endswith(".fasta"):
-#         print("You have entered an appropriate file name.")
-# elif fasta_file.endswith(".fas"):
-#         print("You have entered an appropriate file name.")
-# else:
-#         print("Sorry, you have entered an incorrect file name, please try again.")
-#         fasta_file = input()
-
 while True: 
     #try:
         fasta_name = input("Please enter the file path to your FASTA sequence file. Your file should end with .fas or .fasta. \n")
@@ -35,13 +22,6 @@ while True:
 
 
 #Asking the user to input a restriction enzyme information text file.
-
-
-# print("Please enter the file path to your restriction enzyme file. You file should be a .txt file.")
-# print("This is an example of what each line of your file should look like:")
-# print("EcoRI;G%AATTC")
-# enzyme_file = input()
-
 
 while True: 
         enzyme_name = input("Please enter the file path to your restriction enzyme file. Your file should be a .txt file. \n This is an example of what each line of your file should look like: \n EcoRI;G%AATTC \n")
@@ -88,6 +68,8 @@ for line in enzyme_file:
 
 enzyme = enzyme.split("\n")
 
+enzyme_file.close()
+
 #Check to see if code works.
 #print(enzyme[2])
 
@@ -126,17 +108,62 @@ enzyme_sequence_complete.pop(0)
 
 #How many cut sites are present in the FASTA file per emzyme.
 site_number = str()
+fragment_number = str()
 for line in enzyme_sequence_complete:
     snumber = fasta.count(line)
     print("For the sequence ", line, "there are ", snumber, " site in the fasta file.")
+    fnumber = str(snumber + 1) #number of fragments
     snumber = str(snumber)
     site_number += "\n" + snumber
+    fragment_number += "\n" + fnumber
 
 site_number = site_number.split("\n")
 site_number.pop(0)
 
+fragment_number = fragment_number.split("\n")
+fragment_number.pop(0)
+
 #Check to see if code works.
-#print(site_number[2])
+# print(site_number[1])
+# print(fragment_number[1])
 
 
+#Find where each restriction enzyme cuts the nucelotide sequence.
+#print(enzyme[0].find("R"))
 
+#print(fasta.find(enzyme_sequence_complete[0])) #finds first position
+
+i = 0
+
+for line in range(0,len(enzyme_sequence_complete)):
+    position = str()
+    while True:
+        i = fasta.find(enzyme_sequence_complete[line], i) + 1
+
+        if i < 1:
+            print("Done")
+            break
+        else:
+            print (i)
+            position += "\n" + str(i) 
+   
+    if position == "":
+        print ("No site.")
+    else:
+        position = position.split("\n")
+        position.pop(0)
+        print("Site are: \n" , position) #check to see if code works
+
+# for line in enzyme_sequence_complete:
+#     i = fasta.find(line, i) + 1
+
+#     if i < 1:
+#         print("Done")
+#         break
+#     else:
+#         #print (i)
+#         position += "\n" + str(i) 
+   
+#     # position = position.split("\n")
+#     # position.pop(0)
+#     print(position)
