@@ -36,6 +36,15 @@ while True:
 
 #Take each restriction enzyme and find where it cuts the nucelotide sequence.
 
+#Extract names of each file.
+fasta_name_position = fasta_name.rfind("/")
+fasta_file_name = fasta_name[fasta_name_position + 1 :len(fasta_name)]
+#print(fasta_file_name)
+
+enzyme_name_position = enzyme_name.rfind("/")
+enzyme_file_name = enzyme_name[enzyme_name_position + 1 :len(enzyme_name)]
+#print(enzyme_file_name)
+
 #Open fasta file and read each line.
 fasta_file = open(fasta_name)
 fasta = str()
@@ -48,6 +57,11 @@ for line in fasta_file:
 
 #Splitting each sequence title into its own line. Each line is now an element corresponding the same element in the FASTA file.
 title = title.split("\n")
+title.pop()
+
+#Remove the > from the sequence titles.
+for i in range(0,len(title)):
+    title[i] = title[i].replace(">", "")
 
 fasta_file.close()
 
@@ -57,7 +71,6 @@ fasta_file.close()
 
 #Length of the sequence.
 sequence_length = len(fasta)
-
 
 
 #Open enzyme file and read each line.
@@ -93,6 +106,23 @@ enzyme_sequence.pop(0)
 # print(enzyme_sequence[1])
 
 
+#Find the number of bases before the % sign in each enzyme sequence.
+number_bases = 0
+initial_site = str()
+
+for percent in enzyme_sequence:
+    number_bases = percent.find("%")
+    initial_site += "\n" + str(number_bases)
+
+initial_site = initial_site.split("\n")
+initial_site.pop(0)
+#print(initial_site) #check if this works
+
+#Convert the string list to integer list
+initial_site = [int(i) for i in initial_site]
+#print(initial_site) #check if it works
+
+
 #Remove the % in the enzyme sequence to search for number of cut sites in FASTA file.
 enzyme_sequence_complete = str()
 for line in enzyme_sequence:
@@ -111,7 +141,7 @@ site_number = str()
 fragment_number = str()
 for line in enzyme_sequence_complete:
     snumber = fasta.count(line)
-    print("For the sequence ", line, "there are ", snumber, " site in the fasta file.")
+    #print("For the sequence ", line, "there are ", snumber, " site in the fasta file.")
     fnumber = str(snumber + 1) #number of fragments
     snumber = str(snumber)
     site_number += "\n" + snumber
@@ -128,46 +158,68 @@ fragment_number.pop(0)
 # print(fragment_number[1])
 
 
+#Print the heading of the output.
+print("-"*80)
+print("Restriction enzyme analysis of sequence from file", fasta_file_name, ".")
+print("Cutting with enzymes found in file", enzyme_file_name, ".")
+print("-"*80)
+print("Sequence name:", title[0]) #indexed because we are assuming only one sequence is inputted, otherwise this print statement and the next one would have been in a for loop
+print("Sequence is", sequence_length, "bases long.")
+
 #Find where each restriction enzyme cuts the nucelotide sequence.
 i = 0
 x = 0
+y = 1
 
 for line in range(0,len(enzyme_sequence_complete)):
     start_range = 1
     fragment_length = 0
     position = str()
+    
+    if site_number[line] == "0":
+        print("-"*80)
+        print("There are no sites for", enzyme_type[line], ".")
+        
+    else:
+        print("-"*80)
+        print("There are", site_number[line], "cutting sites for", enzyme_type[line], ", cutting at", enzyme_sequence[line])
+        print("There are", fragment_number[line], "fragments:")
+    
     while True:
-        i = fasta.find(enzyme_sequence_complete[line], i) + 1
+        i = fasta.find(enzyme_sequence_complete[line], i) + 1 #was +1
         cut_length = 0
+
+        y = initial_site[line]
+
+        # if y != 1:
+        #     i += y - 1
 
         if (i < 1) and (position == ""):
             break
         
         elif i < 1:
             print("length:", sequence_length - x, "\t", "range:", x+1, "-", sequence_length)
+            print(fasta[(x): sequence_length])
             #print("Done", x+1) #check - remove later
             break
         else:
-            cut_length += i
-            fragment_length = i - start_range + 1
+            i += y - 1
+            #cut_length += i
+            fragment_length = i - start_range + 1 # was +1
             print ("length:", fragment_length, "\t", "range:", start_range, "-", i) #check - remove later
+            print(fasta[(start_range - 1): i])
             position += "\n" + str(i) 
-            start_range += cut_length 
+            start_range = i +1  #+= cut_length
             x = i
    
     if position == "":
-        print ("There are no sites for", enzyme_type[line], ".")
+        print ("")
     else:
         position = position.split("\n")
         position.pop(0)
         #print("Site are: \n" , position) #check to see if code works
-        print("There are", site_number[line], "cutting sites for", enzyme_type[line], ", cutting at", enzyme_sequence[line])
-        print("There are", fragment_number[line], "fragments:")
+        # print("There are", site_number[line], "cutting sites for", enzyme_type[line], ", cutting at", enzyme_sequence[line])
+        # print("There are", fragment_number[line], "fragments:")
 
 
-#Above code is wrong for AluI
-
-#Need to find a way to count bases before % and after % 
-
-#How to cut the sequence based on this?
-
+#Find way to separate printed sequence in tabs of 10 bases, 60 bases per line
