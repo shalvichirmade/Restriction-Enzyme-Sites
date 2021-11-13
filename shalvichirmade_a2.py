@@ -129,41 +129,45 @@ fragment_number.pop(0)
 
 
 #Find where each restriction enzyme cuts the nucelotide sequence.
-#print(enzyme[0].find("R"))
-
-#print(fasta.find(enzyme_sequence_complete[0])) #finds first position
-
 i = 0
+x = 0
 
 for line in range(0,len(enzyme_sequence_complete)):
+    start_range = 1
+    fragment_length = 0
     position = str()
     while True:
         i = fasta.find(enzyme_sequence_complete[line], i) + 1
+        cut_length = 0
 
-        if i < 1:
-            print("Done")
+        if (i < 1) and (position == ""):
+            break
+        
+        elif i < 1:
+            print("length:", sequence_length - x, "\t", "range:", x+1, "-", sequence_length)
+            #print("Done", x+1) #check - remove later
             break
         else:
-            print (i)
+            cut_length += i
+            fragment_length = i - start_range + 1
+            print ("length:", fragment_length, "\t", "range:", start_range, "-", i) #check - remove later
             position += "\n" + str(i) 
+            start_range += cut_length 
+            x = i
    
     if position == "":
-        print ("No site.")
+        print ("There are no sites for", enzyme_type[line], ".")
     else:
         position = position.split("\n")
         position.pop(0)
-        print("Site are: \n" , position) #check to see if code works
+        #print("Site are: \n" , position) #check to see if code works
+        print("There are", site_number[line], "cutting sites for", enzyme_type[line], ", cutting at", enzyme_sequence[line])
+        print("There are", fragment_number[line], "fragments:")
 
-# for line in enzyme_sequence_complete:
-#     i = fasta.find(line, i) + 1
 
-#     if i < 1:
-#         print("Done")
-#         break
-#     else:
-#         #print (i)
-#         position += "\n" + str(i) 
-   
-#     # position = position.split("\n")
-#     # position.pop(0)
-#     print(position)
+#Above code is wrong for AluI
+
+#Need to find a way to count bases before % and after % 
+
+#How to cut the sequence based on this?
+
