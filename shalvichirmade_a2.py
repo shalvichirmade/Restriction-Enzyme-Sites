@@ -167,8 +167,6 @@ print("Restriction enzyme analysis of sequence from file", fasta_file_name, ".")
 print("Cutting with enzymes found in file", enzyme_file_name, ".")
 print("-"*80)
 
-print(title)
-
 if not title:
     print ("There is no sequence name for this sequence.")
 else:
@@ -254,7 +252,8 @@ for line in range(0,len(enzyme_sequence_complete)):
             print ("length:", fragment_length, " ", "range:", start_range, "-", i) 
             #print(fasta[(start_range - 1): i])
     
-            length = int(math.ceil(fragment_length/10))
+            length = int(math.ceil(fragment_length/10)) 
+
             if length > 6:
                 for bases in range(0,6):
                     end = start + 10
@@ -309,26 +308,38 @@ for line in range(0,len(no_sites)):
 # start = 0
 # end = 0
 
-#length = int(math.ceil(sequence_length/10))
+# length = int(math.ceil(sequence_length/10))
+# six_increment = math.ceil(length/6)
+
+# n = 6
+# six_multiples = list(range(0,(six_increment+1)*n,n)) #multiple of six until six_increment
+# print(six_multiples)
+
+# for six in range(0,six_increment):
+#     for bases in range(six_multiples[bases],six_multiples[bases + 1]):
+#         end = start + 10
+#         print(fasta[start:end], end = "\t")
+#         start = end
+#     print("")
 
 
-#if length > 6:
-#    for bases in range(0,6):
-#        end = start + 10
-#       print(fasta[start:end], end = "\t")
-#        start = end
-#    print("")
-#    for bases in range(7, length + 1):
-#        end = start + 10
-#        print(fasta[start:end], end = "\t")
-#        start = end
-#    print("")
+# if length > 6:
+#     for bases in range(0,6):
+#         end = start + 10
+#         print(fasta[start:end], end = "\t")
+#         start = end
+#     print("")
+#     for bases in range(7, length + 1):
+#         end = start + 10
+#         print(fasta[start:end], end = "\t")
+#         start = end
+#     print("")
     
-#else:    
-#    for bases in range(0,length):
-#        end = start + 10
-#        print(fasta[start:end], end = "\t")
-#        start = end
+# else:    
+#     for bases in range(0,length):
+#         end = start + 10
+#         print(fasta[start:end], end = "\t")
+#         start = end
 
 # #original sequence printed tabs
 # length = int(math.ceil(fragment_length/10))
