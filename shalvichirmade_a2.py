@@ -81,6 +81,9 @@ for line in enzyme_file:
 
 enzyme = enzyme.split("\n")
 
+if enzyme[-1] == "":
+    enzyme.pop()
+
 enzyme_file.close()
 
 #Check to see if code works.
@@ -163,22 +166,36 @@ print("-"*80)
 print("Restriction enzyme analysis of sequence from file", fasta_file_name, ".")
 print("Cutting with enzymes found in file", enzyme_file_name, ".")
 print("-"*80)
-print("Sequence name:", title[0]) #indexed because we are assuming only one sequence is inputted, otherwise this print statement and the next one would have been in a for loop
+
+print(title)
+
+if not title:
+    print ("There is no sequence name for this sequence.")
+else:
+    print("Sequence name:", title[0]) #indexed because we are assuming only one sequence is inputted, otherwise this print statement and the next one would have been in a for loop
 print("Sequence is", sequence_length, "bases long.")
 
 #Find where each restriction enzyme cuts the nucelotide sequence.
 i = 0
 x = 0
 y = 1
+no_sites = str()
+
+
+import math
 
 for line in range(0,len(enzyme_sequence_complete)):
     start_range = 1
     fragment_length = 0
     position = str()
+    start = 0
+    end = 0
     
     if site_number[line] == "0":
-        print("-"*80)
-        print("There are no sites for", enzyme_type[line], ".")
+        #print("-"*80)
+        #print("There are no sites for", enzyme_type[line], ".") #this line and above prints in between.
+        no = enzyme_type[line]
+        no_sites += "\n" + no
         
     else:
         print("-"*80)
@@ -198,16 +215,72 @@ for line in range(0,len(enzyme_sequence_complete)):
             break
         
         elif i < 1:
-            print("length:", sequence_length - x, "\t", "range:", x+1, "-", sequence_length)
-            print(fasta[(x): sequence_length])
-            #print("Done", x+1) #check - remove later
+            print("length:", sequence_length - x, " ", "range:", x+1, "-", sequence_length)
+            #print(fasta[(x): sequence_length])
+
+            length = int(math.ceil((sequence_length - x)/10))
+            if length > 6:
+                for bases in range(0,6):
+                    end = start + 10
+                    print(fasta[start:end], end = " ")
+                    start = end
+                print("")
+                for bases in range(7, length + 1):
+                    end = start + 10
+                    if end > sequence_length:
+                        print(fasta[start:sequence_length])
+                        start = sequence_length
+                    else:
+                        print(fasta[start:end], end = " ")
+                        start = end
+                print("")
+                
+            else:    
+                for bases in range(0, length):
+                    end = start + 10
+                    if end > sequence_length:
+                        print(fasta[start:sequence_length])
+                        start = sequence_length
+                    else:
+                        print(fasta[start:end], end = " ")
+                        start = end
+            print("")
+
             break
         else:
             i += y - 1
             #cut_length += i
             fragment_length = i - start_range + 1 # was +1
-            print ("length:", fragment_length, "\t", "range:", start_range, "-", i) #check - remove later
-            print(fasta[(start_range - 1): i])
+            print ("length:", fragment_length, " ", "range:", start_range, "-", i) 
+            #print(fasta[(start_range - 1): i])
+    
+            length = int(math.ceil(fragment_length/10))
+            if length > 6:
+                for bases in range(0,6):
+                    end = start + 10
+                    print(fasta[start:end], end = " ")
+                    start = end
+                print("")
+                for bases in range(7, length + 1):
+                    end = start + 10
+                    if end > i:
+                        print(fasta[start:i])
+                        start = i
+                    else:
+                        print(fasta[start:end], end = " ")
+                        start = end
+                print("")
+                
+            else:    
+                for bases in range(0, length):
+                    end = start + 10
+                    if end > i:
+                        print(fasta[start:i])
+                        start = i
+                    else:
+                        print(fasta[start:end], end = " ")
+                        start = end
+
             position += "\n" + str(i) 
             start_range = i +1  #+= cut_length
             x = i
@@ -221,5 +294,78 @@ for line in range(0,len(enzyme_sequence_complete)):
         # print("There are", site_number[line], "cutting sites for", enzyme_type[line], ", cutting at", enzyme_sequence[line])
         # print("There are", fragment_number[line], "fragments:")
 
+print("-"*80)
+
+no_sites = no_sites.split("\n")
+no_sites.pop(0)
+
+for line in range(0,len(no_sites)):
+    print("There are no sites for", no_sites[line], ".")
+    print("-"*80)
 
 #Find way to separate printed sequence in tabs of 10 bases, 60 bases per line
+
+# import math
+# start = 0
+# end = 0
+
+#length = int(math.ceil(sequence_length/10))
+
+
+#if length > 6:
+#    for bases in range(0,6):
+#        end = start + 10
+#       print(fasta[start:end], end = "\t")
+#        start = end
+#    print("")
+#    for bases in range(7, length + 1):
+#        end = start + 10
+#        print(fasta[start:end], end = "\t")
+#        start = end
+#    print("")
+    
+#else:    
+#    for bases in range(0,length):
+#        end = start + 10
+#        print(fasta[start:end], end = "\t")
+#        start = end
+
+# #original sequence printed tabs
+# length = int(math.ceil(fragment_length/10))
+# for bases in range(0, length):
+#     end = start + 10
+#     if end > i:
+#         print(fasta[start:i])
+#         start = i
+#     else:
+#         print(fasta[start:end], end = "\t")
+#         start = end
+
+# #To separate in groups of 6
+# length = int(math.ceil((sequence_length - x)/10))
+# if length > 6:
+#     for bases in range(0,6):
+#         end = start + 10
+#         print(fasta[start:end], end = "\t")
+#         start = end
+#     print("")
+#     for bases in range(7, length + 1):
+#         end = start + 10
+#         if end > sequence_length:
+#             print(fasta[start:sequence_length])
+#             start = sequence_length
+#         else:
+#             print(fasta[start:end], end = "\t")
+#             start = end
+#     print("")
+    
+# else:    
+#     for bases in range(0, length):
+#         end = start + 10
+#         if end > sequence_length:
+#             print(fasta[start:sequence_length])
+#             start = sequence_length
+#         else:
+#             print(fasta[start:end], end = "\t")
+#             start = end
+
