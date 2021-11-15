@@ -51,9 +51,11 @@ fasta = str()
 title = str()
 for line in fasta_file:
     if not line.startswith(">"): #disregards title
-        fasta = fasta + line.rstrip() 
+        fasta += line.rstrip() 
     else:
-        title = title + line 
+        title += line 
+
+fasta_file.close()
 
 #Splitting each sequence title into its own line. Each line is now an element corresponding the same element in the FASTA file.
 title = title.split("\n")
@@ -63,7 +65,7 @@ title.pop()
 for i in range(0,len(title)):
     title[i] = title[i].replace(">", "")
 
-fasta_file.close()
+
 
 #Checks to see if code works. 
 #print(fasta[0:100])
@@ -79,12 +81,13 @@ enzyme = str()
 for line in enzyme_file:
     enzyme = enzyme + line
 
+enzyme_file.close()
+
 enzyme = enzyme.split("\n")
 
 if enzyme[-1] == "":
     enzyme.pop()
 
-enzyme_file.close()
 
 #Check to see if code works.
 #print(enzyme[2])
@@ -198,7 +201,7 @@ for line in range(0,len(enzyme_sequence_complete)):
     else:
         print("-"*80)
         print("There are", site_number[line], "cutting sites for", enzyme_type[line], ", cutting at", enzyme_sequence[line])
-        print("There are", fragment_number[line], "fragments:")
+        print("There are", fragment_number[line], "fragments:\n")
     
     while True:
         i = fasta.find(enzyme_sequence_complete[line], i) + 1 #was +1
@@ -217,21 +220,35 @@ for line in range(0,len(enzyme_sequence_complete)):
             #print(fasta[(x): sequence_length])
 
             length = int(math.ceil((sequence_length - x)/10))
+            six_increment = math.ceil(length/6)
+            six_multiples = list(range(0,(six_increment+1)*6,6))
+            six_multiples_end = list(range(6,(six_increment+1)*6,6))
+
             if length > 6:
-                for bases in range(0,6):
-                    end = start + 10
-                    print(fasta[start:end], end = " ")
-                    start = end
-                print("")
-                for bases in range(7, length + 1):
-                    end = start + 10
-                    if end > sequence_length:
-                        print(fasta[start:sequence_length])
-                        start = sequence_length
-                    else:
-                        print(fasta[start:end], end = " ")
-                        start = end
-                print("")
+                for num in range(0,six_increment):
+                    for multiple in range(six_multiples[num], six_multiples_end[num]):
+                        end = start + 10
+                        if end > sequence_length:
+                            print(fasta[start:sequence_length], end = " ")
+                            start = sequence_length
+                            break #
+                        else:
+                            print(fasta[start:end], end = " ")
+                            start = end
+                # for bases in range(0,6):
+                #     end = start + 10
+                #     print(fasta[start:end], end = " ")
+                #     start = end
+                # print("")
+                # for bases in range(7, length + 1):
+                #     end = start + 10
+                #     if end > sequence_length:
+                #         print(fasta[start:sequence_length])
+                #         start = sequence_length
+                #     else:
+                #         print(fasta[start:end], end = " ")
+                #         start = end
+                    print("")
                 
             else:    
                 for bases in range(0, length):
@@ -242,7 +259,7 @@ for line in range(0,len(enzyme_sequence_complete)):
                     else:
                         print(fasta[start:end], end = " ")
                         start = end
-            print("")
+            print("\n\n")
 
             break
         else:
@@ -262,7 +279,7 @@ for line in range(0,len(enzyme_sequence_complete)):
                     for multiple in range(six_multiples[num], six_multiples_end[num]):
                         end = start + 10
                         if end > i:
-                            print(fasta[start:i])
+                            print(fasta[start:i], end = " ")
                             start = i
                             break #
                         else:
@@ -283,7 +300,7 @@ for line in range(0,len(enzyme_sequence_complete)):
                 #     else:
                 #         print(fasta[start:end], end = " ")
                 #         start = end
-                print("")
+                #print("")
                 
             else:    
                 for bases in range(0, length):
