@@ -7,29 +7,26 @@
 #Asking the user to input a FASTA file for analysis.
 
 while True: 
-    #try:
         fasta_name = input("Please enter the file path to your FASTA sequence file. Your file should end with .fas or .fasta. \n")
         if fasta_name.endswith(".fasta"):
-            print("You have entered an appropriate file name.")
+            print("You have entered an appropriate file name.\n")
             break
         elif fasta_name.endswith(".fas"):
-            print("You have entered an appropriate file name.")
+            print("You have entered an appropriate file name.\n")
             break
         else:
-            print("Sorry, you have entered an incorrect file name, please try again.")
-    #except:
-        #print("Sorry, you have entered an incorrect file name, please try again.") - not being used
-
+            print("Sorry, you have entered an incorrect file name, please try again.\n")
+ 
 
 #Asking the user to input a restriction enzyme information text file.
 
 while True: 
-        enzyme_name = input("Please enter the file path to your restriction enzyme file. Your file should be a .txt file. \n This is an example of what each line of your file should look like: \n EcoRI;G%AATTC \n")
+        enzyme_name = input("Please enter the file path to your restriction enzyme file. Your file should be a .txt file. \n This is an example of what each line of your file should look like: \n EcoRI;G%AATTC \n\n")
         if enzyme_name.endswith(".txt"):
-            print("You have entered an appropriate file name.")
+            print("You have entered an appropriate file name.\n")
             break
         else:
-            print("Sorry, you have entered an incorrect file name, please try again.")
+            print("Sorry, you have entered an incorrect file name, please try again.\n")
 
 
 #---------------------------------------------------------------------------
@@ -53,7 +50,7 @@ for line in fasta_file:
     if not line.startswith(">"): #disregards title
         fasta += line.rstrip() 
     else:
-        title += line 
+        title += line #I realized too late, that I could have made this easier for myself, however I used this method for creating every list, so I will leave it this way. I understand that this is not the optimal method for doing so.
 
 fasta_file.close()
 
@@ -64,7 +61,6 @@ title.pop()
 #Remove the > from the sequence titles.
 for i in range(0,len(title)):
     title[i] = title[i].replace(">", "")
-
 
 
 #Checks to see if code works. 
@@ -85,6 +81,7 @@ enzyme_file.close()
 
 enzyme = enzyme.split("\n")
 
+#Enzyme file given had an empty line at the end of the file. I am removing it.
 if enzyme[-1] == "":
     enzyme.pop()
 
@@ -95,10 +92,10 @@ if enzyme[-1] == "":
 #Need to split the name of the enzyme and its appropirate sequence.
 enzyme_type = str()
 enzyme_sequence = str()
-for line in enzyme:
-    test = line.split(";")
-    enzyme_type = enzyme_type + "\n" + test[0]
-    enzyme_sequence = enzyme_sequence + "\n" + test[1]
+for RE in enzyme:
+    sections = RE.split(";")
+    enzyme_type = enzyme_type + "\n" + sections[0]
+    enzyme_sequence = enzyme_sequence + "\n" + sections[1]
 
 #Convert to list and delete the first element which is empty.
 enzyme_type = enzyme_type.split("\n")
@@ -131,9 +128,9 @@ initial_site = [int(i) for i in initial_site]
 
 #Remove the % in the enzyme sequence to search for number of cut sites in FASTA file.
 enzyme_sequence_complete = str()
-for line in enzyme_sequence:
-    full = line.replace("%", "")
-    enzyme_sequence_complete += "\n" + full
+for enzyme in enzyme_sequence:
+    full_sequence = enzyme.replace("%", "")
+    enzyme_sequence_complete += "\n" + full_sequence
 
 #Now each element corresponds to the other enzyme variables.
 enzyme_sequence_complete = enzyme_sequence_complete.split("\n")
@@ -145,9 +142,9 @@ enzyme_sequence_complete.pop(0)
 #How many cut sites are present in the FASTA file per emzyme.
 site_number = str()
 fragment_number = str()
-for line in enzyme_sequence_complete:
-    snumber = fasta.count(line)
-    #print("For the sequence ", line, "there are ", snumber, " site in the fasta file.")
+for sequence in enzyme_sequence_complete:
+    snumber = fasta.count(sequence)
+    #print("For the sequence ", sequence, "there are ", snumber, " site in the fasta file.")
     fnumber = str(snumber + 1) #number of fragments
     snumber = str(snumber)
     site_number += "\n" + snumber
@@ -165,250 +162,123 @@ fragment_number.pop(0)
 
 
 #Print the heading of the output.
-print("-"*80)
-print("Restriction enzyme analysis of sequence from file", fasta_file_name, ".")
-print("Cutting with enzymes found in file", enzyme_file_name, ".")
-print("-"*80)
+print("") #Empty line after entering file paths.
+print("-"*65)
+print("Restriction enzyme analysis of sequence from file ", fasta_file_name, ".", sep = "")
+print("Cutting with enzymes found in file ", enzyme_file_name, ".", sep = "")
+print("-"*65)
 
+#Depending if the fasta file entered has a sequence title or not.
 if not title:
     print ("There is no sequence name for this sequence.")
 else:
     print("Sequence name:", title[0]) #indexed because we are assuming only one sequence is inputted, otherwise this print statement and the next one would have been in a for loop
 print("Sequence is", sequence_length, "bases long.")
 
-#Find where each restriction enzyme cuts the nucelotide sequence.
-i = 0
-x = 0
-y = 1
+#Find where each restriction enzyme cuts the nucelotide sequence. Print outputs.
+frag_end_pos = 0
+last_frag_pos = 0
+inc = 1
 no_sites = str()
-
 
 import math
 
-for line in range(0,len(enzyme_sequence_complete)):
+#This for loop is for printing the whole output. It is iterated for the number of enzymes in the enzyme file.
+for enz_seq in range(0,len(enzyme_sequence_complete)):
     start_range = 1
     fragment_length = 0
     position = str()
     start = 0
     end = 0
     
-    if site_number[line] == "0":
-        #print("-"*80)
-        #print("There are no sites for", enzyme_type[line], ".") #this line and above prints in between.
-        no = enzyme_type[line]
-        no_sites += "\n" + no
+    #This if statement extracts the names of the enzymes with no cut sites.
+    if site_number[enz_seq] == "0":
+        enzyme = enzyme_type[enz_seq]
+        no_sites += "\n" + enzyme
         
+    #Else prints the length, range and the fragment sequences for each enzyme with cut sites.
     else:
-        print("-"*80)
-        print("There are", site_number[line], "cutting sites for", enzyme_type[line], ", cutting at", enzyme_sequence[line])
-        print("There are", fragment_number[line], "fragments:\n")
+        print("-"*65)
+        print("There are ", site_number[enz_seq], " cutting sites for ", enzyme_type[enz_seq], ", cutting at ", enzyme_sequence[enz_seq], sep ="")
+        print("There are", fragment_number[enz_seq], "fragments:\n")
     
+    #For printing the whole sequence until the last fragment is detected.
     while True:
-        i = fasta.find(enzyme_sequence_complete[line], i) + 1 #was +1
+        frag_end_pos = fasta.find(enzyme_sequence_complete[enz_seq], frag_end_pos) + 1 
         cut_length = 0
 
-        y = initial_site[line]
+        inc = initial_site[enz_seq]
 
-        # if y != 1:
-        #     i += y - 1
+        #When there are no cut sites.
+        if (frag_end_pos < 1) and (position == ""):
+            break 
+        
+        #Printing the last fragment.
+        elif frag_end_pos < 1:
+            print("length: ", sequence_length - last_frag_pos, " range: ", last_frag_pos + 1, "-", sequence_length, sep = "")
 
-        if (i < 1) and (position == ""):
+            length = int(math.ceil((sequence_length - last_frag_pos)/10))
+            print_newline = 0
+
+            #Separting bases in groups of ten and adding a new line when there are six groups.
+            for bases in range(0, length + 1):
+                end = start + 10
+                if end > sequence_length:
+                    print(fasta[start:sequence_length])
+                    start = sequence_length
+                else:
+                    print(fasta[start:end], end = " ")
+                    start = end
+                print_newline += 1
+                if print_newline == 6:
+                    print("")
+                    print_newline = 0
+
             break
         
-        elif i < 1:
-            print("length:", sequence_length - x, " ", "range:", x+1, "-", sequence_length)
-            #print(fasta[(x): sequence_length])
-
-            length = int(math.ceil((sequence_length - x)/10))
-            six_increment = math.ceil(length/6)
-            six_multiples = list(range(0,(six_increment+1)*6,6))
-            six_multiples_end = list(range(6,(six_increment+1)*6,6))
-
-            if length > 6:
-                for num in range(0,six_increment):
-                    for multiple in range(six_multiples[num], six_multiples_end[num]):
-                        end = start + 10
-                        if end > sequence_length:
-                            print(fasta[start:sequence_length], end = " ")
-                            start = sequence_length
-                            break #
-                        else:
-                            print(fasta[start:end], end = " ")
-                            start = end
-                # for bases in range(0,6):
-                #     end = start + 10
-                #     print(fasta[start:end], end = " ")
-                #     start = end
-                # print("")
-                # for bases in range(7, length + 1):
-                #     end = start + 10
-                #     if end > sequence_length:
-                #         print(fasta[start:sequence_length])
-                #         start = sequence_length
-                #     else:
-                #         print(fasta[start:end], end = " ")
-                #         start = end
-                    print("")
-                
-            else:    
-                for bases in range(0, length):
-                    end = start + 10
-                    if end > sequence_length:
-                        print(fasta[start:sequence_length])
-                        start = sequence_length
-                    else:
-                        print(fasta[start:end], end = " ")
-                        start = end
-            print("\n\n")
-
-            break
+        #Printing the rest of the fragments.
         else:
-            i += y - 1
-            #cut_length += i
-            fragment_length = i - start_range + 1 # was +1
-            print ("length:", fragment_length, " ", "range:", start_range, "-", i) 
-            #print(fasta[(start_range - 1): i])
+            frag_end_pos += inc - 1
+            fragment_length = frag_end_pos - start_range + 1 
+            print ("length: ", fragment_length, " range: ", start_range, "-", frag_end_pos, sep = "") 
     
             length = int(math.ceil(fragment_length/10)) 
-            six_increment = math.ceil(length/6)
-            six_multiples = list(range(0,(six_increment+1)*6,6))
-            six_multiples_end = list(range(6,(six_increment+1)*6,6))
+            print_newline = 0
 
-            if length > 6:
-                for num in range(0,six_increment):
-                    for multiple in range(six_multiples[num], six_multiples_end[num]):
-                        end = start + 10
-                        if end > i:
-                            print(fasta[start:i], end = " ")
-                            start = i
-                            break #
-                        else:
-                            print(fasta[start:end], end = " ")
-                            start = end
+            #Separting bases in groups of ten and adding a new line when there are six groups.
+            for bases in range(0, length + 1):
+                end = start + 10
+                if end > frag_end_pos:
+                    print(fasta[start:frag_end_pos], end = " ")
+                    start = frag_end_pos
+                    break
+                else:
+                    print(fasta[start:end], end = " ")
+                    start = end
+                print_newline += 1
+                if print_newline == 6:
                     print("")
-
-                # for bases in range(0,6):
-                #     end = start + 10
-                #     print(fasta[start:end], end = " ")
-                #     start = end
-                # print("")
-                # for bases in range(7, length + 1):
-                #     end = start + 10
-                #     if end > i:
-                #         print(fasta[start:i])
-                #         start = i
-                #     else:
-                #         print(fasta[start:end], end = " ")
-                #         start = end
-                #print("")
-                
-            else:    
-                for bases in range(0, length):
-                    end = start + 10
-                    if end > i:
-                        print(fasta[start:i])
-                        start = i
-                    else:
-                        print(fasta[start:end], end = " ")
-                        start = end
-
-            position += "\n" + str(i) 
-            start_range = i +1  #+= cut_length
-            x = i
+                    print_newline = 0
+            print("")
+            
+            position += "\n" + str(frag_end_pos) 
+            start_range = frag_end_pos +1  
+            last_frag_pos = frag_end_pos
    
     if position == "":
         print ("")
     else:
         position = position.split("\n")
         position.pop(0)
-        #print("Site are: \n" , position) #check to see if code works
-        # print("There are", site_number[line], "cutting sites for", enzyme_type[line], ", cutting at", enzyme_sequence[line])
-        # print("There are", fragment_number[line], "fragments:")
 
-print("-"*80)
+print("\n" + "-"*65)
 
+#Making list of enzymes without cut sites.
 no_sites = no_sites.split("\n")
 no_sites.pop(0)
 
-for line in range(0,len(no_sites)):
-    print("There are no sites for", no_sites[line], ".")
-    print("-"*80)
-
-#Find way to separate printed sequence in tabs of 10 bases, 60 bases per line
-
-# import math
-# start = 0
-# end = 0
-
-# length = int(math.ceil(sequence_length/10))
-# six_increment = math.ceil(length/6)
-
-# n = 6
-# six_multiples = list(range(0,(six_increment+1)*n,n)) #multiple of six until six_increment
-# print(six_multiples)
-
-# for six in range(0,six_increment):
-#     for bases in range(six_multiples[bases],six_multiples[bases + 1]):
-#         end = start + 10
-#         print(fasta[start:end], end = "\t")
-#         start = end
-#     print("")
-
-
-# if length > 6:
-#     for bases in range(0,6):
-#         end = start + 10
-#         print(fasta[start:end], end = "\t")
-#         start = end
-#     print("")
-#     for bases in range(7, length + 1):
-#         end = start + 10
-#         print(fasta[start:end], end = "\t")
-#         start = end
-#     print("")
-    
-# else:    
-#     for bases in range(0,length):
-#         end = start + 10
-#         print(fasta[start:end], end = "\t")
-#         start = end
-
-# #original sequence printed tabs
-# length = int(math.ceil(fragment_length/10))
-# for bases in range(0, length):
-#     end = start + 10
-#     if end > i:
-#         print(fasta[start:i])
-#         start = i
-#     else:
-#         print(fasta[start:end], end = "\t")
-#         start = end
-
-# #To separate in groups of 6
-# length = int(math.ceil((sequence_length - x)/10))
-# if length > 6:
-#     for bases in range(0,6):
-#         end = start + 10
-#         print(fasta[start:end], end = "\t")
-#         start = end
-#     print("")
-#     for bases in range(7, length + 1):
-#         end = start + 10
-#         if end > sequence_length:
-#             print(fasta[start:sequence_length])
-#             start = sequence_length
-#         else:
-#             print(fasta[start:end], end = "\t")
-#             start = end
-#     print("")
-    
-# else:    
-#     for bases in range(0, length):
-#         end = start + 10
-#         if end > sequence_length:
-#             print(fasta[start:sequence_length])
-#             start = sequence_length
-#         else:
-#             print(fasta[start:end], end = "\t")
-#             start = end
+#Print the enzymes without cut sites.
+for enzyme in range(0,len(no_sites)):
+    print("There are no sites for ", no_sites[enzyme], ".", sep ="")
+    print("-"*65)
 
