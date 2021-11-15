@@ -253,21 +253,36 @@ for line in range(0,len(enzyme_sequence_complete)):
             #print(fasta[(start_range - 1): i])
     
             length = int(math.ceil(fragment_length/10)) 
+            six_increment = math.ceil(length/6)
+            six_multiples = list(range(0,(six_increment+1)*6,6))
+            six_multiples_end = list(range(6,(six_increment+1)*6,6))
 
             if length > 6:
-                for bases in range(0,6):
-                    end = start + 10
-                    print(fasta[start:end], end = " ")
-                    start = end
-                print("")
-                for bases in range(7, length + 1):
-                    end = start + 10
-                    if end > i:
-                        print(fasta[start:i])
-                        start = i
-                    else:
-                        print(fasta[start:end], end = " ")
-                        start = end
+                for num in range(0,six_increment):
+                    for multiple in range(six_multiples[num], six_multiples_end[num]):
+                        end = start + 10
+                        if end > i:
+                            print(fasta[start:i])
+                            start = i
+                            break #
+                        else:
+                            print(fasta[start:end], end = " ")
+                            start = end
+                    print("")
+
+                # for bases in range(0,6):
+                #     end = start + 10
+                #     print(fasta[start:end], end = " ")
+                #     start = end
+                # print("")
+                # for bases in range(7, length + 1):
+                #     end = start + 10
+                #     if end > i:
+                #         print(fasta[start:i])
+                #         start = i
+                #     else:
+                #         print(fasta[start:end], end = " ")
+                #         start = end
                 print("")
                 
             else:    
