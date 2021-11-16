@@ -7,7 +7,7 @@
 #Asking the user to input a FASTA file for analysis.
 
 while True: 
-        fasta_name = input("Please enter the file path to your FASTA sequence file. Your file should end with .fas or .fasta. \n")
+        fasta_name = input("\nPlease enter the file path to your FASTA sequence file. Your file should end with .fas or .fasta. \n\n")
         if fasta_name.endswith(".fasta"):
             print("You have entered an appropriate file name.\n")
             break
@@ -15,7 +15,7 @@ while True:
             print("You have entered an appropriate file name.\n")
             break
         else:
-            print("Sorry, you have entered an incorrect file name, please try again.\n")
+            print("Sorry, you have entered an incorrect FASTA file name, please try again.\n")
  
 
 #Asking the user to input a restriction enzyme information text file.
@@ -26,7 +26,7 @@ while True:
             print("You have entered an appropriate file name.\n")
             break
         else:
-            print("Sorry, you have entered an incorrect file name, please try again.\n")
+            print("Sorry, you have entered an incorrect text file name, please try again.\n")
 
 
 #---------------------------------------------------------------------------
@@ -36,11 +36,9 @@ while True:
 #Extract names of each file.
 fasta_name_position = fasta_name.rfind("/")
 fasta_file_name = fasta_name[fasta_name_position + 1 :len(fasta_name)]
-#print(fasta_file_name)
 
 enzyme_name_position = enzyme_name.rfind("/")
 enzyme_file_name = enzyme_name[enzyme_name_position + 1 :len(enzyme_name)]
-#print(enzyme_file_name)
 
 #Open fasta file and read each line.
 fasta_file = open(fasta_name)
@@ -50,7 +48,7 @@ for line in fasta_file:
     if not line.startswith(">"): #disregards title
         fasta += line.rstrip() 
     else:
-        title += line #I realized too late, that I could have made this easier for myself, however I used this method for creating every list, so I will leave it this way. I understand that this is not the optimal method for doing so.
+        title += line #I realized too late, that I could have made this easier for myself. However I used this method for creating every list, so I will leave it this way. I understand that this is not the optimal method for doing so. I could have defined the variable as a list in the beginning and used append to add every element.
 
 fasta_file.close()
 
@@ -62,10 +60,6 @@ title.pop()
 for i in range(0,len(title)):
     title[i] = title[i].replace(">", "")
 
-
-#Checks to see if code works. 
-#print(fasta[0:100])
-#print(title[0:15]) - tested on a fasta file containing multiple sequences
 
 #Length of the sequence.
 sequence_length = len(fasta)
@@ -86,8 +80,6 @@ if enzyme[-1] == "":
     enzyme.pop()
 
 
-#Check to see if code works.
-#print(enzyme[2])
 
 #Need to split the name of the enzyme and its appropirate sequence.
 enzyme_type = str()
@@ -104,10 +96,8 @@ enzyme_type.pop(0)
 enzyme_sequence = enzyme_sequence.split("\n")
 enzyme_sequence.pop(0)
 
-#Check to see it code works.
-# print(enzyme_type[1])
-# print(enzyme_sequence[1])
 
+#---------------------------------------------------------------------------
 
 #Find the number of bases before the % sign in each enzyme sequence.
 number_bases = 0
@@ -119,11 +109,10 @@ for percent in enzyme_sequence:
 
 initial_site = initial_site.split("\n")
 initial_site.pop(0)
-#print(initial_site) #check if this works
+
 
 #Convert the string list to integer list
-initial_site = [int(i) for i in initial_site]
-#print(initial_site) #check if it works
+initial_site = [int(i) for i in initial_site] #I used "i" because this was my first time using a one-line for loop; I found it easier to formulate my code.
 
 
 #Remove the % in the enzyme sequence to search for number of cut sites in FASTA file.
@@ -136,15 +125,13 @@ for enzyme in enzyme_sequence:
 enzyme_sequence_complete = enzyme_sequence_complete.split("\n")
 enzyme_sequence_complete.pop(0)
 
-#Check to see if code works. 
-#print(enzyme_sequence_complete[1])
+
 
 #How many cut sites are present in the FASTA file per emzyme.
 site_number = str()
 fragment_number = str()
 for sequence in enzyme_sequence_complete:
-    snumber = fasta.count(sequence)
-    #print("For the sequence ", sequence, "there are ", snumber, " site in the fasta file.")
+    snumber = fasta.count(sequence) #number of cut sites
     fnumber = str(snumber + 1) #number of fragments
     snumber = str(snumber)
     site_number += "\n" + snumber
@@ -156,13 +143,11 @@ site_number.pop(0)
 fragment_number = fragment_number.split("\n")
 fragment_number.pop(0)
 
-#Check to see if code works.
-# print(site_number[1])
-# print(fragment_number[1])
 
+#---------------------------------------------------------------------------
 
 #Print the heading of the output.
-print("") #Empty line after entering file paths.
+print("") #Empty line after entering file paths; creates a separation for this result output.
 print("-"*65)
 print("Restriction enzyme analysis of sequence from file ", fasta_file_name, ".", sep = "")
 print("Cutting with enzymes found in file ", enzyme_file_name, ".", sep = "")
@@ -178,7 +163,6 @@ print("Sequence is", sequence_length, "bases long.")
 #Find where each restriction enzyme cuts the nucelotide sequence. Print outputs.
 frag_end_pos = 0
 last_frag_pos = 0
-inc = 1
 no_sites = str()
 
 import math
