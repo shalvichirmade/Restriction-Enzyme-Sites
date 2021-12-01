@@ -8,3 +8,5 @@ Enzyme file should be .txt and has each line in this format:
 EcoRI;G%AATTC
 
 Output file will display the sequence title, length, number of cut sites and fragments for each enzyme.
+
+Script written for an assignment - BINF 6410 Bioinformatics Programming at the University of Guelph.
