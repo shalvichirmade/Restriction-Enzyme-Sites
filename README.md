@@ -10,3 +10,4 @@ EcoRI;G%AATTC
 Output file will display the sequence title, length, number of cut sites and fragments for each enzyme.
 
 Script written for an assignment - BINF 6410 Bioinformatics Programming at the University of Guelph.
+Received a 100%.
